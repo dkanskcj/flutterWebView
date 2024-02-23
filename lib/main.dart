@@ -27,28 +27,24 @@ class WebViewApp extends StatefulWidget {
 
 class _WebViewAppState extends State<WebViewApp> {
   late final WebViewController controller;
-
+  var innertHtml = 1;
   @override
   void initState() {
     controller = WebViewController()
-      ..setBackgroundColor(const Color(0xFF3CC1F2))
+      // ..setBackgroundColor(const Color(0xFF3CC1F2))
       ..loadRequest(Uri.parse('http://erp_dev.enjoysoft.net'))
       ..addJavaScriptChannel(
         'app2web',
         onMessageReceived: (JavaScriptMessage message) {
           // 받으면 스낵바로 띄워줌
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(message.message),
-            ),
-          );
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   SnackBar(
+          //     content: Text(message.message),
+          //   ),
+          // );
           // 받았으니 자바스크립트 실행
-          controller.runJavaScript('appToWeb("hihihi")');
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(message.message),
-            ),
-          );
+          controller.runJavaScript("appToWeb($innertHtml)");
+          innertHtml++;
         },
       )
       ..setJavaScriptMode(JavaScriptMode.unrestricted);
