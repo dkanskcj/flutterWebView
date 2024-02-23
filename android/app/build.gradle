@@ -23,6 +23,10 @@ if (flutterVersionName == null) {
 }
 
 android {
+    // 앱 아이콘 변경
+    aaptOptions{
+        cruncherEnabled = false
+    }
     namespace "com.example.webview_flutter_test"
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
@@ -46,7 +50,7 @@ android {
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion 19//flutter.minSdkVersion
-        targetSdkVersion flutter.targetSdkVersion
+        targetSdkVersion 32 //flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }

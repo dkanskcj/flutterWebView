@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:ffi';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -26,7 +27,7 @@ class WebViewApp extends StatefulWidget {
 
 class _WebViewAppState extends State<WebViewApp> {
   late final WebViewController controller;
-  var value = 0;
+
   @override
   void initState() {
     controller = WebViewController()
@@ -41,16 +42,13 @@ class _WebViewAppState extends State<WebViewApp> {
               content: Text(message.message),
             ),
           );
-          if (value == 0) {
-            value++;
-            // 받았으니 자바스크립트 실행
-            controller.runJavaScript('appToWeb("hihihi")');
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(message.message),
-              ),
-            );
-          }
+          // 받았으니 자바스크립트 실행
+          controller.runJavaScript('appToWeb("hihihi")');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(message.message),
+            ),
+          );
         },
       )
       ..setJavaScriptMode(JavaScriptMode.unrestricted);
@@ -60,6 +58,7 @@ class _WebViewAppState extends State<WebViewApp> {
 
   @override
   Widget build(BuildContext context) {
+    DateTime? currentBackPressTime;
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -109,8 +108,44 @@ class _WebViewAppState extends State<WebViewApp> {
           )
         ],
       ),
-      body: MyWebView(
-        controller: controller,
+      body: WillPopScope(
+        onWillPop: () async {
+          DateTime now = DateTime.now();
+          if (currentBackPressTime == null ||
+              now.difference(currentBackPressTime!) >
+                  const Duration(seconds: 1)) {
+            currentBackPressTime = now;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: [
+                    const Icon(
+                      Icons.notification_important,
+                      color: Colors.white,
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                      child: Text(
+                        '뒤로가기 버튼을 한 번 더 누르시면 종료됩니다.',
+                        style: Theme.of(context)
+                            .textTheme
+                            .subtitle1!
+                            .copyWith(color: Colors.white),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            );
+            return Future.value(false);
+          }
+          return Future.value(true);
+        },
+        child: MyWebView(
+          controller: controller,
+        ),
       ),
     );
   }
